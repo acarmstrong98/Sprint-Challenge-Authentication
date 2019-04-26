@@ -1,4 +1,7 @@
 const axios = require('axios');
+const bcrypt = require('bcryptjs');
+
+const users = require('../users/users-model.js');
 
 const { authenticate } = require('../auth/authenticate');
 
@@ -9,18 +12,32 @@ module.exports = server => {
 };
 
 function register(req, res) {
+
   // implement user registration
-}
+  let user = req.body;
+  const hash = bcrypt.hashSync(user.password, 10);
+  user.password = hash;
+
+  users.add(user)
+    .then(saved => {
+      res.status(201).json(saved);
+    })
+    .catch(error => {
+      res.status(500).json(error);
+    });
+};
+
+
 
 function login(req, res) {
+
   // implement user login
 }
-
 function getJokes(req, res) {
   const requestOptions = {
     headers: { accept: 'application/json' },
   };
-
+  
   axios
     .get('https://icanhazdadjoke.com/search', requestOptions)
     .then(response => {
